@@ -1,0 +1,4 @@
+MARIADB_ROOT_PASSWORD=changepassword
+MARIADB_DATABASE=tienda_escalada
+MARIADB_USER=root
+MARIADB_PASSWORD=changepassword
