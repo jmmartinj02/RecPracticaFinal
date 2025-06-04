@@ -8,7 +8,6 @@ class EventosController {
     //llama a los metodos de los modelos para transferir los datos que extraen a las vistas.
     public function index() {
         $modeloEvento = new EventoModel();
-        $modeloUsuario = new UsuarioModel();
         
         $datos = [
             'titulo' => "Eventos disponibles",

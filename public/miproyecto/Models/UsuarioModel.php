@@ -19,29 +19,36 @@ class UsuarioModel {
     }
     //inserta un nuevo usuario en la base de datos, utilizando los datos del formulario
     public function registrarUsuario($datos) {
-    //validar datos antes de insertar, no voy a encriptar contraseñas, luego es un lio
-    if (empty($datos['nombre']) || empty($datos['email']) || empty($datos['password'])) {
-        return false;
-    }
+        // Validación más completa, sin hash en contraseña que luego es un rollo
+        if (empty($datos['nombre']) || empty($datos['email']) || empty($datos['password'])) {
+            throw new Exception("Datos incompletos para el registro");
+        }
 
-    $query = "INSERT INTO usuarios (nombre, apellidos, email, telefono, password, nivel_escalada, rol) 
-              VALUES (:nombre, :apellidos, :email, :telefono, :password, :nivel_escalada, 'usuario')";
-    
-    try {
-        $stmt = $this->db->prepare($query);
-        return $stmt->execute([
-            ':nombre' => $datos['nombre'],
-            ':apellidos' => $datos['apellidos'] ?? null,
-            ':email' => $datos['email'],
-            ':telefono' => $datos['telefono'] ?? null,
-            ':password' => $datos['password'],
-            ':nivel_escalada' => $datos['nivel_escalada'] ?? 'principiante'
-        ]);
-    } catch (PDOException $e) {
-        error_log("Error al registrar usuario: " . $e->getMessage());
-        return false;
+        // Verificar formato email
+        if (!filter_var($datos['email'], FILTER_VALIDATE_EMAIL)) {
+            throw new Exception("Formato de email inválido");
+        }
+
+        $query = "INSERT INTO usuarios (nombre, apellidos, email, telefono, password, nivel_escalada, rol) 
+                VALUES (:nombre, :apellidos, :email, :telefono, :password, :nivel_escalada, 'usuario')";
+        
+        try {
+            $stmt = $this->db->prepare($query);
+            $success = $stmt->execute([
+                ':nombre' => $datos['nombre'],
+                ':apellidos' => $datos['apellidos'] ?? null,
+                ':email' => $datos['email'],
+                ':telefono' => $datos['telefono'] ?? null,
+                ':password' => $datos['password'],
+                ':nivel_escalada' => $datos['nivel_escalada'] ?? 'principiante'
+            ]);
+            
+            return $success && $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error al registrar usuario: " . $e->getMessage());
+            return false;
+        }
     }
-}
     //lsita los participantes de un evento específico
     public function obtenerPorEvento($eventoId) {
         $query = "SELECT u.id, u.nombre, u.apellidos, u.nivel_escalada, ep.estado, ep.fecha_inscripcion 

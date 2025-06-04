@@ -2,7 +2,14 @@
 
 <div class="container mt-4">
     <h1><i class="bi bi-shield-lock"></i> <?= htmlspecialchars($titulo) ?></h1>
-    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gestión de Eventos</h1>
+        <?php if(isset($_SESSION['usuario']) && $_SESSION['usuario']['rol'] === 'admin'): ?>
+            <a href="index.php?controller=AdminController&action=addEvento" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Añadir Evento
+            </a>
+        <?php endif; ?>
+    </div>
     <div class="table-responsive mt-3">
         <table class="table table-hover">
             <thead>

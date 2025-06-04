@@ -95,67 +95,67 @@ class LoginController {
         exit;
     }
     public function registro() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-        //redirigir, por si por algun casual, ya hubiese una sesion iniciada,
-        // manda a un sitio u otro, echa un vistazo a la funcion redirigSegunRol para mas info.
-        if (isset($_SESSION['usuario'])) {
-            $this->redirigirSegunRol();
-            return;
-        }
+    if (isset($_SESSION['usuario'])) {
+        $this->redirigirSegunRol();
+        return;
+    }
 
-        $error = null;
-        $modeloUsuario = new UsuarioModel();
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $datos = [
-                'nombre' => trim($_POST['nombre']),
-                'apellidos' => trim($_POST['apellidos']),
-                'email' => trim($_POST['email']),
-                'telefono' => trim($_POST['telefono'] ?? ''),
-                'password' => $_POST['password'],
-                'nivel_escalada' => $_POST['nivel_escalada']
-            ];
+    $error = null;
+    $modeloUsuario = new UsuarioModel();
+    $valores = []; // Almacenará los valores del formulario
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $valores = [
+            'nombre' => trim($_POST['nombre']),
+            'apellidos' => trim($_POST['apellidos'] ?? ''),
+            'email' => trim($_POST['email']),
+            'telefono' => trim($_POST['telefono'] ?? ''),
+            'nivel_escalada' => $_POST['nivel_escalada'] ?? 'principiante'
+        ];
 
-            // Validaciones
-            if (empty($datos['nombre']) || empty($datos['email']) || empty($datos['password'])) {
-                $error = "Todos los campos obligatorios deben ser completados";
-            } elseif ($_POST['password'] !== $_POST['confirm_password']) {
-                $error = "Las contraseñas no coinciden";
-            } elseif ($modeloUsuario->obtenerPorEmail($datos['email'])) {
-                $error = "Este correo electrónico ya está registrado";
+        // Validaciones
+        if (empty($valores['nombre']) || empty($valores['email']) || empty($_POST['password'])) {
+            $error = "Todos los campos obligatorios deben ser completados";
+        } elseif ($_POST['password'] !== $_POST['confirm_password']) {
+            $error = "Las contraseñas no coinciden";
+        } elseif ($modeloUsuario->obtenerPorEmail($valores['email'])) {
+            $error = "Este correo electrónico ya está registrado";
+        } else {
+            // Registrar usuario
+            $datosRegistro = $valores;
+            $datosRegistro['password'] = $_POST['password'];
+            
+            if ($modeloUsuario->registrarUsuario($datosRegistro)) {
+                // Iniciar sesión automáticamente
+                $usuario = $modeloUsuario->obtenerPorEmail($valores['email']);
+                $_SESSION['usuario'] = [
+                    'id' => $usuario['id'],
+                    'nombre' => $usuario['nombre'],
+                    'apellidos' => $usuario['apellidos'],
+                    'email' => $usuario['email'],
+                    'telefono' => $usuario['telefono'],
+                    'nivel_escalada' => $usuario['nivel_escalada'],
+                    'rol' => $usuario['rol']
+                ];
+                
+                $this->redirigirSegunRol();
+                return;
             } else {
-                // Registrar usuario
-                if ($modeloUsuario->registrarUsuario($datos)) {
-                    // Iniciar sesión automáticamente
-                    $usuario = $modeloUsuario->obtenerPorEmail($datos['email']);
-                    $_SESSION['usuario'] = [
-                        'id' => $usuario['id'],
-                        'nombre' => $usuario['nombre'],
-                        'apellidos' => $usuario['apellidos'],
-                        'email' => $usuario['email'],
-                        'telefono' => $usuario['telefono'],
-                        'nivel_escalada' => $usuario['nivel_escalada'],
-                        'rol' => $usuario['rol']
-                    ];
-                    
-                    $this->redirigirSegunRol();
-                    return;
-                } else {
-                    $error = "Error al registrar el usuario. Por favor, inténtelo de nuevo.";
-                }
+                $error = "Error al registrar el usuario. Por favor, inténtelo de nuevo.";
             }
         }
-        
-
-        View::show('registroView', [
-            'error' => $error,
-            'titulo' => 'Registro de usuario',
-            'valores' => $_POST ?? [] // Mantener valores ingresados
-        ]);
     }
+
+    View::show('registroView', [
+        'error' => $error,
+        'titulo' => 'Registro de usuario',
+        'valores' => $valores // Pasamos los valores al formulario
+    ]);
+}
     public function misEventos() {
         if (!isset($_SESSION['usuario'])) {
             header('Location: index.php?controller=LoginController&action=login');

@@ -39,6 +39,12 @@
         <div class="text-center mb-5">
             <h1 class="display-4 fw-bold text-primary">Escalada Montaña Viva</h1>
             <p class="lead">Desde Mérida, impulsando el deporte de aventura con seguridad y pasión</p>
+           <script>
+            echo '<pre>';
+            var_dump($_SESSION);
+            echo '</pre>';
+            exit
+            </script>
         </div>
         <div class="row g-4">
             <!-- Tarjeta 1 -->
@@ -137,7 +143,7 @@
 
 <style>
     .about-page {
-        padding-top: 56px; /* Para compensar el navbar fijo */
+        padding-top: 56px;
     }
     .carousel-item {
         height: 60vh;

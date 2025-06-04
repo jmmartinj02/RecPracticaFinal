@@ -1,7 +1,14 @@
 <?php require_once __DIR__.'/../includes/header.php'; ?>
 
 <div class="container mt-4">
-    <h1><?= htmlspecialchars($titulo) ?></h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><?= htmlspecialchars($titulo) ?></h1>
+        <?php if(isset($_SESSION['usuario']) && $_SESSION['usuario']['rol'] === 'admin'): ?>
+            <a href="index.php?controller=AdminController&action=addEvento" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Añadir Evento
+            </a>
+        <?php endif; ?>
+    </div>
     
     <?php if (!empty($mensaje)): ?>
         <div class="alert alert-info"><?= htmlspecialchars($mensaje) ?></div>
@@ -10,6 +17,7 @@
     <?php if (empty($eventos)): ?>
         <div class="alert alert-info">No hay eventos programados actualmente.</div>
     <?php else: ?>
+
         <div class="row">
             <?php foreach ($eventos as $evento): ?>
                 <div class="col-md-6 col-lg-4 mb-4">

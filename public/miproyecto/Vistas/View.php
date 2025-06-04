@@ -6,7 +6,7 @@ class View {
         }
         //sacado de reddit, carga el directorio base y monta una ruta para los archivos
         //para las vistas, carga tanto el header como el footer, y guarda la ruta de la vista
-        //como se encuentra en la misma carpeta no hace falta nada
+        //como se encuentra en la misma carpeta no hace falta nada mas en directorio base.
         $baseDir = __DIR__ . '/';
         $rutaHeader = $baseDir . '../includes/header.php';
         $rutaVista = $baseDir . $nombreVista . '.php';
@@ -19,10 +19,12 @@ class View {
             exit;
         }
         
-        // Extraer variables para la vista
+        //Extraer variables para la vista
         extract($datos);
         
-        // Incluir componentes
+        //incluir componentes, OJO, SI SE HACE REQUIRE EN ALGUNA OTRA VISTA
+        //PUEDE QUE ALGUNA PAGINA PIERDA LAS FUNCIONALIDADES DEL HEADER, NO PODRÁS ACCEDER, POR EJEMPLO
+        //A LA OPCIÓN DE CERRAR SESIÓN
         require $rutaHeader;
         require $rutaVista;
         require $rutaFooter;

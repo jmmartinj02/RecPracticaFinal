@@ -94,4 +94,55 @@ class EventoModel {
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+        public function crearEvento($datos) {
+        $query = "INSERT INTO eventos (nombre, descripcion, fecha_inicio, fecha_fin, 
+                                lugar, max_participantes, dificultad) 
+                VALUES (:nombre, :descripcion, :fecha_inicio, :fecha_fin, 
+                        :lugar, :max_participantes, :dificultad)";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([
+            ':nombre' => $datos['nombre'],
+            ':descripcion' => $datos['descripcion'],
+            ':fecha_inicio' => $datos['fecha_inicio'],
+            ':fecha_fin' => $datos['fecha_fin'] ?? null,
+            ':lugar' => $datos['lugar'],
+            ':max_participantes' => $datos['max_participantes'] ?? null,
+            ':dificultad' => $datos['dificultad']
+        ]);
+        
+        return $this->db->lastInsertId(); // Devuelve el ID del nuevo evento
+    }
+
+    public function validarDatosEvento($datos) {
+        $errores = [];
+        
+        if (empty($datos['nombre'])) {
+            $errores[] = "El nombre del evento es obligatorio";
+        }
+        
+        if (empty($datos['descripcion'])) {
+            $errores[] = "La descripción es obligatoria";
+        }
+        
+        if (empty($datos['fecha_inicio'])) {
+            $errores[] = "La fecha de inicio es obligatoria";
+        } elseif (strtotime($datos['fecha_inicio']) < time()) {
+            $errores[] = "La fecha de inicio no puede ser en el pasado";
+        }
+        
+        if (!empty($datos['fecha_fin']) && strtotime($datos['fecha_fin']) < strtotime($datos['fecha_inicio'])) {
+            $errores[] = "La fecha de fin no puede ser anterior a la de inicio";
+        }
+        
+        if (empty($datos['lugar'])) {
+            $errores[] = "El lugar es obligatorio";
+        }
+        
+        if (!empty($datos['max_participantes']) && $datos['max_participantes'] < 1) {
+            $errores[] = "El número máximo de participantes debe ser al menos 1";
+        }
+        
+        return $errores;
+    }
 }
