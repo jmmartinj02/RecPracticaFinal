@@ -16,7 +16,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="nombre" class="form-label">Nombre del Evento</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" 
+                                <input type="text" class="form-control" id="nombre" name="nombre"
                                        value="<?= isset($datos['nombre']) ? htmlspecialchars($datos['nombre']) : '' ?>" required>
                             </div>
                             <div class="col-md-6 mb-3">

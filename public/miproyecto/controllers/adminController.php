@@ -13,7 +13,7 @@ class AdminController {
             'usuario' => $_SESSION['usuario']
         ]);
     }
-    // Añade estos métodos a tu AdminController
+    
 public function addEvento() {
         // Verificación de sesión
         if (!isset($_SESSION['usuario'])) {
@@ -32,7 +32,8 @@ public function addEvento() {
             require_once __DIR__.'/../Models/EventoModel.php';
             $eventoModel = new EventoModel();
             
-            // Recoger y sanitizar datos
+            //una pijada el trim, para quitarle los espacios en blanco al principio y al final del string
+            // -.0.-
             $datos = [
                 'nombre' => trim($_POST['nombre']),
                 'descripcion' => trim($_POST['descripcion']),
@@ -51,10 +52,14 @@ public function addEvento() {
                     $_SESSION['mensaje_exito'] = "Evento creado correctamente";
                     header('Location: index.php?controller=AdminController&action=gestionEventos');
                     exit();
+                    //ahora erro, general de la base de datos, por si estuviese el docker caido
                 } else {
                     $datosVista['error'] = "Error al crear el evento. Por favor, inténtalo de nuevo.";
                     $datosVista['datos'] = $datos;
                 }
+                //en este por si alguno de los campos no ha pasado la verificacion, realmente lo que hace 
+                // es convertir en un string el contenido de $errores, para que simplemente los escriba, y obviamente
+                //los datos que se volverán a colocar en sus correspondientes campos, en $datos
             } else {
                 $datosVista['error'] = implode("<br>", $errores);
                 $datosVista['datos'] = $datos;

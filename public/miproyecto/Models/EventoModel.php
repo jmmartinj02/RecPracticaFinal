@@ -94,6 +94,7 @@ class EventoModel {
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    //lo mismo practicamente que en los otros, meto la consulta en el query y uso los datos del formulario
         public function crearEvento($datos) {
         $query = "INSERT INTO eventos (nombre, descripcion, fecha_inicio, fecha_fin, 
                                 lugar, max_participantes, dificultad) 
@@ -124,13 +125,13 @@ class EventoModel {
         if (empty($datos['descripcion'])) {
             $errores[] = "La descripción es obligatoria";
         }
-        
+        //si esta vacio o la fecha es anterior a la actual
         if (empty($datos['fecha_inicio'])) {
             $errores[] = "La fecha de inicio es obligatoria";
         } elseif (strtotime($datos['fecha_inicio']) < time()) {
             $errores[] = "La fecha de inicio no puede ser en el pasado";
         }
-        
+        //si no esta vacia y la fecha de fin es anterior a la fecha de inicio
         if (!empty($datos['fecha_fin']) && strtotime($datos['fecha_fin']) < strtotime($datos['fecha_inicio'])) {
             $errores[] = "La fecha de fin no puede ser anterior a la de inicio";
         }
@@ -142,7 +143,7 @@ class EventoModel {
         if (!empty($datos['max_participantes']) && $datos['max_participantes'] < 1) {
             $errores[] = "El número máximo de participantes debe ser al menos 1";
         }
-        
+        //guardado en errores, para 
         return $errores;
     }
 }
